@@ -138,6 +138,35 @@
       // Resetear formulario
       form.reset();
       document.getElementById('tiempo').value = '';
-    });</script> 
+    });
+  
+  //guardar los viajes al cargar la página
+
+    function guardarEnGoogleSheets(data) {
+  fetch('https://script.google.com/macros/s/TU-LINK/exec', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.text())
+  .then(result => console.log('Guardado:', result))
+  .catch(error => console.error('Error:', error));
+}
+const datos = {
+  fecha: '2025-08-05',
+  horaInicio: '08:00',
+  horaFin: '09:15',
+  tipoViaje: 'Ida-Vuelta',
+  pasaje: 'Persona',
+  km: 24.3,
+  ingreso: 350,
+  gasolina: 50,
+  notas: 'Cliente puntual'
+};
+
+guardarEnGoogleSheets(datos);</script> 
 </body>
 </html>
+
