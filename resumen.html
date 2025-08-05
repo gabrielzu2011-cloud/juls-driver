@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resumen de Viajes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+
+  <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">Resumen de Viajes</h1>
+
+    <!-- Filtros -->
+    <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+      <button onclick="filtrar('semana')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Filtrar por Semana</button>
+      <button onclick="filtrar('mes')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Filtrar por Mes</button>
+      <button onclick="filtrar('todos')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Ver Todos</button>
+    </div>
+
+    <!-- Totales -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center font-semibold mb-6">
+      <div class="bg-blue-100 p-4 rounded shadow">
+        <div>Kilómetros</div>
+        <div id="totalKm">0</div>
+      </div>
+      <div class="bg-green-100 p-4 rounded shadow">
+        <div>Ingreso ($)</div>
+        <div id="totalIngreso">0</div>
+      </div>
+      <div class="bg-yellow-100 p-4 rounded shadow">
+        <div>Gasolina ($)</div>
+        <div id="totalGasolina">0</div>
+      </div>
+      <div class="bg-gray-200 p-4 rounded shadow">
+        <div>Ganancia Neta ($)</div>
+        <div id="totalGanancia">0</div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full text-sm border">
+        <thead>
+          <tr class="bg-gray-200 text-left">
+            <th class="p-2 border">Fecha</th>
+            <th class="p-2 border">Tipo</th>
+            <th class="p-2 border">Pasaje</th>
+            <th class="p-2 border">Km</th>
+            <th class="p-2 border">Tiempo</th>
+            <th class="p-2 border">Ingreso</th>
+            <th class="p-2 border">Gasolina</th>
+          </tr>
+        </thead>
+        <tbody id="tablaViajes" class="divide-y"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let todosLosViajes = JSON.parse(localStorage.getItem('viajes')) || [];
+
+    function filtrar(tipo) {
+      const hoy = new Date();
+      let viajesFiltrados = [];
+
+      if (tipo === 'semana') {
+        const inicioSemana = new Date(hoy);
+        inicioSemana.setDate(hoy.getDate() - hoy.getDay()); // domingo
+        viajesFiltrados = todosLosViajes.filter(v => {
+          const fechaViaje = new Date(v.fecha);
+          return fechaViaje >= inicioSemana && fechaViaje <= hoy;
+        });
+      } else if (tipo === 'mes') {
+        const mes = hoy.getMonth();
+        const año = hoy.getFullYear();
+        viajesFiltrados = todosLosViajes.filter(v => {
+          const f = new Date(v.fecha);
+          return f.getMonth() === mes && f.getFullYear() === año;
+        });
+      } else {
+        viajesFiltrados = todosLosViajes;
+      }
+
+      renderTabla(viajesFiltrados);
+      calcularTotales(viajesFiltrados);
+    }
+
+    function renderTabla(viajes) {
+      const tabla = document.getElementById('tablaViajes');
+      tabla.innerHTML = '';
+
+      viajes.forEach(v => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td class="p-2 border">${v.fecha}</td>
+          <td class="p-2 border">${v.tipoViaje}</td>
+          <td class="p-2 border">${v.tipoPasaje}</td>
+          <td class="p-2 border text-right">${v.km} km</td>
+          <td class="p-2 border text-right">${v.tiempo} min</td>
+          <td class="p-2 border text-right">$${v.ingreso.toFixed(2)}</td>
+          <td class="p-2 border text-right">$${(v.gasolina || 0).toFixed(2)}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+
+    function calcularTotales(viajes) {
+      let totalKm = 0, totalIngreso = 0, totalGasolina = 0;
+
+      viajes.forEach(v => {
+        totalKm += v.km;
+        totalIngreso += v.ingreso;
+        totalGasolina += v.gasolina || 0;
+      });
+
+      document.getElementById('totalKm').textContent = totalKm.toFixed(1) + ' km';
+      document.getElementById('totalIngreso').textContent = '$' + totalIngreso.toFixed(2);
+      document.getElementById('totalGasolina').textContent = '$' + totalGasolina.toFixed(2);
+      document.getElementById('totalGanancia').textContent = '$' + (totalIngreso - totalGasolina).toFixed(2);
+    }
+
+    // Mostrar todos al cargar
+    filtrar('todos');
+  </script>
+</body>
+</html>

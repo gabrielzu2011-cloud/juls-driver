@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Viajes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-xl mx-auto bg-white shadow-lg rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-center mb-4 text-blue-700">Registro de Viajes</h1>
+
+    <form id="form-viaje" class="space-y-4">
+
+      <!-- Fecha -->
+      <div>
+        <label class="block font-semibold">Fecha del viaje:</label>
+        <input type="date" class="w-full border p-2 rounded" required>
+      </div>
+
+      <!-- Hora inicio y fin -->
+      <div class="flex space-x-4">
+        <div class="flex-1">
+          <label class="block font-semibold">Hora de inicio:</label>
+          <input type="time" class="w-full border p-2 rounded" required>
+        </div>
+        <div class="flex-1">
+          <label class="block font-semibold">Hora de término:</label>
+          <input type="time" class="w-full border p-2 rounded" required>
+        </div>
+      </div>
+
+      <!-- Tipo de viaje -->
+      <div>
+        <label class="block font-semibold">Tipo de viaje:</label>
+        <select class="w-full border p-2 rounded" required>
+          <option value="">Selecciona una opción</option>
+          <option value="ida">Ida</option>
+          <option value="vuelta">Vuelta</option>
+          <option value="ida-vuelta">Ida y vuelta</option>
+          <option value="ida-espera-vuelta">Ida + espera + vuelta</option>
+        </select>
+      </div>
+
+      <!-- Tipo de pasaje -->
+      <div>
+        <label class="block font-semibold">Tipo de pasaje:</label>
+        <select class="w-full border p-2 rounded" required>
+          <option value="">Selecciona una opción</option>
+          <option value="persona">Persona</option>
+          <option value="carga">Carga</option>
+        </select>
+      </div>
+
+      <!-- Kilómetros -->
+      <div>
+        <label class="block font-semibold">Kilómetros recorridos:</label>
+        <input type="number" step="0.1" class="w-full border p-2 rounded" required>
+      </div>
+
+      <!-- Tiempo de recorrido -->
+      <div>
+        <label class="block font-semibold">Tiempo recorrido (minutos):</label>
+        <input type="number" class="w-full border p-2 rounded" required>
+      </div>
+
+      <!-- Ingreso del viaje -->
+      <div>
+        <label class="block font-semibold">Ingreso ($):</label>
+        <input type="number" step="0.01" class="w-full border p-2 rounded" required>
+      </div>
+
+      <!-- Gasto de gasolina -->
+      <div>
+        <label class="block font-semibold">Gasto de gasolina ($):</label>
+        <input type="number" step="0.01" class="w-full border p-2 rounded">
+      </div>
+
+      <!-- Botón -->
+      <div class="text-center">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Guardar viaje
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+
+  
+
+
+  <script> const form = document.getElementById('form-viaje');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Obtener valores
+      const fecha = document.getElementById('fecha').value;
+      const horaInicio = document.getElementById('horaInicio').value;
+      const horaFin = document.getElementById('horaFin').value;
+      const tipoViaje = document.getElementById('tipoViaje').value;
+      const tipoPasaje = document.getElementById('tipoPasaje').value;
+      const km = parseFloat(document.getElementById('km').value);
+      const ingreso = parseFloat(document.getElementById('ingreso').value);
+      const gasolina = parseFloat(document.getElementById('gasolina').value || 0);
+
+      // Calcular tiempo recorrido (en minutos)
+      const [hIni, mIni] = horaInicio.split(':').map(Number);
+      const [hFin, mFin] = horaFin.split(':').map(Number);
+      const inicioMin = hIni * 60 + mIni;
+      const finMin = hFin * 60 + mFin;
+      const tiempo = finMin - inicioMin;
+
+      document.getElementById('tiempo').value = tiempo;
+
+      // Crear objeto del viaje
+      const viaje = {
+        fecha,
+        horaInicio,
+        horaFin,
+        tipoViaje,
+        tipoPasaje,
+        km,
+        tiempo,
+        ingreso,
+        gasolina
+      };
+
+      // Guardar en LocalStorage
+      let viajes = JSON.parse(localStorage.getItem('viajes')) || [];
+      viajes.push(viaje);
+      localStorage.setItem('viajes', JSON.stringify(viajes));
+
+      // Confirmación
+      alert('✅ Viaje guardado correctamente');
+
+      // Resetear formulario
+      form.reset();
+      document.getElementById('tiempo').value = '';
+    });</script> 
+</body>
+</html>
